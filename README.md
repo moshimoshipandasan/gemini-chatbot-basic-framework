@@ -45,7 +45,7 @@ Apps Scriptエディタで以下のファイルを作成し、このリポジト
 
 ### 4. Gemini APIキーの取得
 
-1. [Google AI Studio](https://makersuite.google.com/app/apikey) にアクセス
+1. [Google AI Studio](https://aistudio.google.com/app/api-keys) にアクセス
 2. **Get API Key** をクリック
 3. 新しいAPIキーを作成
 4. 取得したAPIキーを次のステップで設定します
