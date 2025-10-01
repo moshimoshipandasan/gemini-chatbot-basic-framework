@@ -1,0 +1,6 @@
+# Claude Code specific files
+CLAUDE.md
+.serena/
+
+# CLASP configuration
+.clasp.json

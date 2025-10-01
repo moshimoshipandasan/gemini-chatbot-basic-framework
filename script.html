@@ -1,0 +1,99 @@
+<script>
+// 最小限のグローバル変数
+const elements = {
+    messages: null,
+    input: null,
+    send: null
+};
+
+// 初期化
+function init() {
+    elements.messages = document.getElementById('messages');
+    elements.input = document.getElementById('input');
+    elements.send = document.getElementById('send');
+
+    // イベントリスナー
+    elements.send.addEventListener('click', sendMessage);
+    elements.input.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') sendMessage();
+    });
+
+    // 初期メッセージ
+    addMessage('bot', 'こんにちは！');
+}
+
+// メッセージ送信
+function sendMessage() {
+    const text = elements.input.value.trim();
+    if (!text) return;
+
+    // UIを更新
+    addMessage('user', text);
+    elements.input.value = '';
+    elements.send.disabled = true;
+
+    // ローディング表示
+    const loadingId = addLoading();
+
+    // サーバーに送信
+    google.script.run
+        .withSuccessHandler((response) => {
+            removeLoading(loadingId);
+            addMessage('bot', response);
+            elements.send.disabled = false;
+        })
+        .withFailureHandler((error) => {
+            removeLoading(loadingId);
+            addMessage('bot', 'エラーが発生しました。もう一度お試しください。');
+            elements.send.disabled = false;
+            console.error(error);
+        })
+        .processMessage(text);
+}
+
+// メッセージ追加
+function addMessage(type, text) {
+    const div = document.createElement('div');
+    div.className = `message ${type}`;
+    div.innerHTML = `<span>${escapeHtml(text)}</span>`;
+    elements.messages.appendChild(div);
+    scrollToBottom();
+}
+
+// ローディング追加
+function addLoading() {
+    const div = document.createElement('div');
+    div.className = 'loading';
+    div.id = `loading-${Date.now()}`;
+    div.textContent = '返信を作成中...';
+    elements.messages.appendChild(div);
+    scrollToBottom();
+    return div.id;
+}
+
+// ローディング削除
+function removeLoading(id) {
+    const loading = document.getElementById(id);
+    if (loading) loading.remove();
+}
+
+// スクロール
+function scrollToBottom() {
+    elements.messages.scrollTop = elements.messages.scrollHeight;
+}
+
+// HTMLエスケープ
+function escapeHtml(text) {
+    const map = {
+        '&': '&amp;',
+        '<': '&lt;',
+        '>': '&gt;',
+        '"': '&quot;',
+        "'": '&#39;'
+    };
+    return text.replace(/[&<>"']/g, m => map[m]);
+}
+
+// 起動
+window.addEventListener('DOMContentLoaded', init);
+</script>
